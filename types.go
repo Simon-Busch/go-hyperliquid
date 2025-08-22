@@ -89,7 +89,7 @@ type LimitOrderType struct {
 }
 
 type TriggerOrderType struct {
-	TriggerPx float64 `json:"triggerPx"`
+	TriggerPx float64 `json:"triggerPx"` // Keep as float64 for internal use, convert to string in wire format
 	IsMarket  bool    `json:"isMarket"`
 	Tpsl      string  `json:"tpsl"` // "tp" or "sl"
 }
@@ -97,6 +97,22 @@ type TriggerOrderType struct {
 type BuilderInfo struct {
 	Builder string `json:"b"`
 	Fee     int    `json:"f"`
+}
+
+// Wire format types for order types (used in actions.go)
+type OrderTypeWire struct {
+	Limit   *LimitOrderTypeWire   `json:"limit,omitempty" msgpack:"limit,omitempty"`
+	Trigger *TriggerOrderTypeWire `json:"trigger,omitempty" msgpack:"trigger,omitempty"`
+}
+
+type LimitOrderTypeWire struct {
+	Tif string `json:"tif" msgpack:"tif"` // TifAlo, TifIoc, TifGtc
+}
+
+type TriggerOrderTypeWire struct {
+	IsMarket  bool   `json:"isMarket" msgpack:"isMarket"`
+	TriggerPx string `json:"triggerPx" msgpack:"triggerPx"`
+	Tpsl      string `json:"tpsl" msgpack:"tpsl"` // "tp" or "sl"
 }
 
 type CancelRequest struct {
@@ -179,6 +195,23 @@ type OpenOrder struct {
 	Side      string  `json:"side"`
 	Size      float64 `json:"sz,string"`
 	Timestamp int64   `json:"timestamp"`
+}
+
+// FrontendOpenOrder represents the detailed order information returned by frontendOpenOrders
+type FrontendOpenOrder struct {
+	Coin             string  `json:"coin"`
+	IsPositionTpsl   bool    `json:"isPositionTpsl"`
+	IsTrigger        bool    `json:"isTrigger"`
+	LimitPx          float64 `json:"limitPx,string"`
+	Oid              int64   `json:"oid"`
+	OrderType        string  `json:"orderType"`
+	OrigSz           float64 `json:"origSz,string"`
+	ReduceOnly       bool    `json:"reduceOnly"`
+	Side             string  `json:"side"`
+	Size             float64 `json:"sz,string"`
+	Timestamp        int64   `json:"timestamp"`
+	TriggerCondition string  `json:"triggerCondition"`
+	TriggerPx        float64 `json:"triggerPx,string"`
 }
 
 type Fill struct {
